@@ -1,0 +1,17 @@
+[Desktop Entry]
+Name=Montage
+GenericName=Video Editor
+Comment=Edit video on a multitrack timeline and export for the web, social and masters
+Exec=singularity-montage %U
+Icon=dev.sinty.montage
+Terminal=false
+Type=Application
+Categories=AudioVideo;Video;AudioVideoEditing;
+Keywords=video;editor;timeline;cut;trim;montage;premiere;subtitles;
+MimeType=application/x-montage-project;application/x-otio;text/x-edl;application/x-fcpxml;
+StartupNotify=true
+Actions=new-window;
+
+[Desktop Action new-window]
+Name=New Window
+Exec=singularity-montage

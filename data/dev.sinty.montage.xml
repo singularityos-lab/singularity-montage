@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-montage-project">
+    <comment>Montage project</comment>
+    <sub-class-of type="application/zip"/>
+    <glob pattern="*.montage"/>
+  </mime-type>
+  <mime-type type="application/x-otio">
+    <comment>OpenTimelineIO timeline</comment>
+    <sub-class-of type="application/json"/>
+    <glob pattern="*.otio"/>
+  </mime-type>
+  <mime-type type="application/x-otioz">
+    <comment>OpenTimelineIO bundle</comment>
+    <sub-class-of type="application/zip"/>
+    <glob pattern="*.otioz"/>
+  </mime-type>
+  <mime-type type="text/x-edl">
+    <comment>Edit decision list</comment>
+    <sub-class-of type="text/plain"/>
+    <glob pattern="*.edl"/>
+  </mime-type>
+  <mime-type type="application/x-fcpxml">
+    <comment>Final Cut Pro XML</comment>
+    <sub-class-of type="application/xml"/>
+    <glob pattern="*.fcpxml"/>
+  </mime-type>
+</mime-info>

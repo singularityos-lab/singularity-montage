@@ -1,0 +1,18 @@
+TITLE: EDL Cut
+
+001  intervie V     C        00:00:01:00 00:00:04:00 00:00:00:00 00:00:03:00
+* FROM CLIP NAME:  Interview
+* FROM CLIP: file:///media/interview.mov
+* OTIO TRUNCATED REEL NAME FROM: interview.mov
+002  broll    V     C        00:00:00:00 00:00:01:12 00:00:04:00 00:00:05:12
+* FROM CLIP NAME:  Broll
+* FROM CLIP: file:///media/broll.mov
+* OTIO TRUNCATED REEL NAME FROM: broll.mov
+003  broll    V     C        00:00:01:12 00:00:01:12 00:00:05:12 00:00:05:12
+003  closing  V     D 025    00:00:04:12 00:00:09:00 00:00:05:12 00:00:10:00
+* FROM CLIP NAME:  Broll
+* FROM CLIP: file:///media/broll.mov
+* OTIO TRUNCATED REEL NAME FROM: broll.mov
+* TO CLIP NAME:  Closing
+* TO CLIP: file:///media/closing.mov
+* OTIO TRUNCATED REEL NAME FROM: closing.mov

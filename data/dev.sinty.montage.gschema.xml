@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="dev.sinty.montage" path="/dev/sinty/montage/">
+    <key name="default-resolution" type="s">
+      <choices>
+        <choice value="1280x720"/>
+        <choice value="1920x1080"/>
+        <choice value="2560x1440"/>
+        <choice value="3840x2160"/>
+        <choice value="1080x1920"/>
+        <choice value="1080x1080"/>
+      </choices>
+      <default>'1920x1080'</default>
+      <summary>Frame size of new sequences</summary>
+    </key>
+    <key name="default-frame-rate" type="i">
+      <range min="1" max="3000"/>
+      <default>30</default>
+      <summary>Frame rate of new sequences; 2398 and 2997 mean 23.976 and 29.97</summary>
+    </key>
+    <key name="auto-sequence" type="b">
+      <default>true</default>
+      <summary>Put the first imported media on the timeline and match the sequence to it</summary>
+    </key>
+    <key name="transition-frames" type="i">
+      <range min="1" max="600"/>
+      <default>25</default>
+      <summary>Length of the default transition in frames</summary>
+    </key>
+    <key name="snapping" type="b">
+      <default>true</default>
+      <summary>Snap clips to edits, markers and the playhead</summary>
+    </key>
+    <key name="keymap" type="s">
+      <choices>
+        <choice value="montage"/>
+        <choice value="finalcut"/>
+        <choice value="avid"/>
+      </choices>
+      <default>'montage'</default>
+      <summary>Keyboard layout for editing</summary>
+    </key>
+    <key name="preview-resolution" type="s">
+      <choices>
+        <choice value="full"/>
+        <choice value="half"/>
+        <choice value="quarter"/>
+      </choices>
+      <default>'half'</default>
+      <summary>Resolution of the program monitor during playback</summary>
+    </key>
+    <key name="use-proxies" type="b">
+      <default>true</default>
+      <summary>Play proxies instead of the original media when they exist</summary>
+    </key>
+    <key name="auto-proxies" type="b">
+      <default>true</default>
+      <summary>Create proxies in the background for heavy media on import</summary>
+    </key>
+    <key name="proxy-threshold" type="i">
+      <range min="360" max="8640"/>
+      <default>1080</default>
+      <summary>Media taller than this many pixels gets a proxy automatically</summary>
+    </key>
+    <key name="background-render" type="b">
+      <default>true</default>
+      <summary>Render sections with effects in the background for smooth playback</summary>
+    </key>
+    <key name="hardware-decoding" type="b">
+      <default>true</default>
+      <summary>Decode video on the graphics card when possible</summary>
+    </key>
+    <key name="hardware-encoding" type="b">
+      <default>true</default>
+      <summary>Encode exports on the graphics card when possible</summary>
+    </key>
+    <key name="auto-save-versions" type="i">
+      <range min="0" max="50"/>
+      <default>5</default>
+      <summary>Earlier versions kept in the Montage Auto-Save folder when saving</summary>
+    </key>
+    <key name="scene-sensitivity" type="i">
+      <range min="0" max="100"/>
+      <default>60</default>
+      <summary>How easily scene detection cuts a clip</summary>
+    </key>
+    <key name="transcription-language" type="s">
+      <default>''</default>
+      <summary>Language code for transcription; empty follows the desktop language</summary>
+    </key>
+    <key name="transcription-command" type="s">
+      <default>''</default>
+      <summary>Command that transcribes {file} in {language}; empty uses the desktop dictation</summary>
+    </key>
+    <key name="last-preset" type="s">
+      <default>'web-1080'</default>
+      <summary>Export preset used last</summary>
+    </key>
+  </schema>
+</schemalist>

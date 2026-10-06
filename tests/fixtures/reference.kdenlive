@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mlt version="6.23.0" title="Reference Cut" LC_NUMERIC="C" producer="main_bin">
+	<profile description="HD 1080p 25.0 fps" frame_rate_num="25" frame_rate_den="1" width="1920" height="1080" display_aspect_num="16" display_aspect_den="9" sample_aspect_num="1" sample_aspect_den="1" colorspace="709" progressive="1"/>
+	<producer id="producer0" in="00:00:00.000" out="00:00:19.960">
+		<property name="global_feed">1</property>
+		<property name="mlt_service">avformat-novalidate</property>
+		<property name="resource">/media/interview.mov</property>
+		<property name="kdenlive:clipname">Interview</property>
+		<property name="length">500</property>
+		<property name="kdenlive:id">4</property>
+		<property name="length">500</property>
+	</producer>
+	<producer id="producer1" in="00:00:00.000" out="00:00:19.960">
+		<property name="global_feed">1</property>
+		<property name="mlt_service">avformat-novalidate</property>
+		<property name="resource">/media/broll.mov</property>
+		<property name="kdenlive:clipname">Broll</property>
+		<property name="length">500</property>
+		<property name="kdenlive:id">5</property>
+	</producer>
+	<producer id="producer2" in="00:00:00.000" out="00:00:19.960">
+		<property name="global_feed">1</property>
+		<property name="mlt_service">avformat-novalidate</property>
+		<property name="resource">/media/closing.mov</property>
+		<property name="kdenlive:clipname">Closing</property>
+		<property name="length">500</property>
+		<property name="kdenlive:id">6</property>
+	</producer>
+	<producer id="producer3" in="00:00:00.000" out="00:00:19.960">
+		<property name="global_feed">1</property>
+		<property name="mlt_service">avformat-novalidate</property>
+		<property name="resource">/media/music.wav</property>
+		<property name="kdenlive:clipname">Music</property>
+		<property name="length">500</property>
+		<property name="kdenlive:id">7</property>
+	</producer>
+	<playlist id="main_bin">
+		<property name="kdenlive:docproperties.decimalPoint">.</property>
+		<property name="kdenlive:docproperties.version">0.98</property>
+		<property name="xml_retain">1</property>
+		<property name="kdenlive:docproperties.guides">[{&quot;pos&quot;: 50, &quot;comment&quot;: &quot;Chapter One&quot;, &quot;type&quot;: 6}]</property>
+		<entry producer="producer0" in="00:00:00.000" out="00:00:19.960">
+			<property name="kdenlive:id">4</property>
+		</entry>
+		<entry producer="producer1" in="00:00:00.000" out="00:00:19.960">
+			<property name="kdenlive:id">5</property>
+		</entry>
+		<entry producer="producer2" in="00:00:00.000" out="00:00:19.960">
+			<property name="kdenlive:id">6</property>
+		</entry>
+		<entry producer="producer3" in="00:00:00.000" out="00:00:19.960">
+			<property name="kdenlive:id">7</property>
+		</entry>
+		<property name="kdenlive:docproperties.guidesCategories">[{&quot;color&quot;: &quot;#f39c1f&quot;, &quot;comment&quot;: &quot;Category 1&quot;, &quot;index&quot;: 6}]</property>
+	</playlist>
+	<producer id="black_track">
+		<property name="resource">black</property>
+		<property name="mlt_service">color</property>
+	</producer>
+	<playlist id="playlist0">
+		<entry producer="producer0" in="00:00:01.000" out="00:00:03.960">
+			<property name="kdenlive:id">4</property>
+		</entry>
+		<blank length="00:00:01.000"/>
+		<entry producer="producer1" in="00:00:00.000" out="00:00:01.960">
+			<property name="kdenlive:id">5</property>
+		</entry>
+		<entry producer="producer2" in="00:00:05.000" out="00:00:08.960">
+			<property name="kdenlive:id">6</property>
+		</entry>
+	</playlist>
+	<playlist id="playlist1"/>
+	<tractor id="tractor0">
+		<property name="kdenlive:track_name">V1</property>
+		<track producer="playlist0" hide="audio"/>
+		<track producer="playlist1" hide="both"/>
+	</tractor>
+	<playlist id="playlist2">
+		<property name="kdenlive:audio_track">1</property>
+		<entry producer="producer0" in="00:00:01.000" out="00:00:03.960">
+			<property name="kdenlive:id">4</property>
+		</entry>
+		<blank length="00:00:01.000"/>
+		<entry producer="producer3" in="00:00:00.000" out="00:00:05.960">
+			<property name="kdenlive:id">7</property>
+		</entry>
+	</playlist>
+	<playlist id="playlist3"/>
+	<tractor id="tractor1">
+		<property name="kdenlive:track_name">A1</property>
+		<track producer="playlist2" hide="video"/>
+		<track producer="playlist3" hide="both"/>
+		<property name="kdenlive:audio_track">1</property>
+	</tractor>
+	<tractor global_feed="1">
+		<track producer="black_track"/>
+		<track producer="tractor0"/>
+		<track producer="tractor1"/>
+	</tractor>
+</mlt>

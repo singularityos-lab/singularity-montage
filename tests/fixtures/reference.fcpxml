@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fcpxml>
+
+<fcpxml version="1.8">
+    <resources>
+        <format id="r1" frameDuration="1/25s" name=""/>
+        <asset name="Interview" src="file:///media/interview.mov" format="r1" id="r2" duration="20/1s" start="0s" hasAudio="1" hasVideo="1"/>
+        <asset name="Broll" src="file:///media/broll.mov" format="r1" id="r3" duration="20/1s" start="0s" hasAudio="0" hasVideo="1"/>
+        <asset name="Closing" src="file:///media/closing.mov" format="r1" id="r4" duration="20/1s" start="0s" hasAudio="0" hasVideo="1"/>
+        <asset name="Music" src="file:///media/music.wav" format="r1" id="r5" duration="20/1s" start="0s" hasAudio="1" hasVideo="0"/>
+    </resources>
+    <asset-clip name="Interview" format="r1" ref="r2" duration="20/1s"/>
+    <asset-clip name="Broll" format="r1" ref="r3" duration="20/1s"/>
+    <asset-clip name="Closing" format="r1" ref="r4" duration="20/1s"/>
+    <asset-clip name="Interview" format="r1" ref="r2" duration="20/1s"/>
+    <asset-clip name="Music" format="r1" ref="r5" duration="20/1s"/>
+    <project name="Reference Cut" uid="">
+        <sequence duration="10/1s" format="r1">
+            <spine>
+                <clip name="Interview" offset="0s" duration="3/1s" start="1s">
+                    <video offset="0s" ref="r2" duration="20/1s"/>
+                    <clip name="Interview" offset="1s" duration="3/1s" start="1s" lane="-1">
+                        <gap name="Gap" offset="0s" duration="20/1s">
+                            <audio offset="0s" ref="r2" duration="20/1s" lane="-1"/>
+                        </gap>
+                    </clip>
+                </clip>
+                <gap name="Gap" duration="1/1s" offset="3s" start="3600s"/>
+                <clip name="Broll" offset="4s" duration="2/1s">
+                    <video offset="0s" ref="r3" duration="20/1s"/>
+                    <clip name="Music" offset="0s" duration="6/1s" lane="-1">
+                        <gap name="Gap" offset="0s" duration="20/1s">
+                            <audio offset="0s" ref="r5" duration="20/1s" lane="-1"/>
+                        </gap>
+                    </clip>
+                </clip>
+                <clip name="Closing" offset="6s" duration="4/1s" start="5s">
+                    <video offset="0s" ref="r4" duration="20/1s"/>
+                </clip>
+            </spine>
+        </sequence>
+    </project>
+</fcpxml>

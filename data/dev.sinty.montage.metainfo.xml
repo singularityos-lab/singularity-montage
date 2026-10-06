@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>dev.sinty.montage</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <name>Montage</name>
+  <summary>Edit video on a multitrack timeline</summary>
+  <description>
+    <p>Montage is a non-linear video editor for creators and editors. It works offline with your files and needs no account.</p>
+    <ul>
+      <li>Multitrack timeline with insert, overwrite, ripple, roll, slip, slide and razor edits</li>
+      <li>Transitions, keyframes on every parameter, picture in picture and blend modes</li>
+      <li>Colour correction in linear light, colour wheels, curves, LUTs, scopes and HDR</li>
+      <li>Chroma key, masks with tracking and a stabilizer</li>
+      <li>Titles, templates, rolling credits and captions with SRT and WebVTT</li>
+      <li>Mixer with buses, automation, equalizer, compressor, noise reduction and loudness normalisation</li>
+      <li>Multicamera editing, audio sync, scene detection and editing by transcript</li>
+      <li>Export queue with web, social and master presets, chapters and hardware encoding</li>
+      <li>OpenTimelineIO, EDL, Final Cut Pro XML, FCPXML, AAF and Premiere project import</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">dev.sinty.montage.desktop</launchable>
+  <url type="bugtracker">https://github.com/singularityos-lab/singularity-desktop/issues</url>
+  <content_rating type="oars-1.1"/>
+</component>

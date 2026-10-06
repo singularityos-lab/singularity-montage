@@ -1,0 +1,182 @@
+{
+    "schema-id": "dev.sinty.montage",
+    "settings": [
+        {
+            "key": "default-resolution",
+            "label": "New Sequence Size",
+            "type": "string",
+            "widget": "combo",
+            "options": [
+                {
+                    "id": "1280x720",
+                    "label": "1280 x 720"
+                },
+                {
+                    "id": "1920x1080",
+                    "label": "1920 x 1080"
+                },
+                {
+                    "id": "2560x1440",
+                    "label": "2560 x 1440"
+                },
+                {
+                    "id": "3840x2160",
+                    "label": "3840 x 2160 (4K)"
+                },
+                {
+                    "id": "1080x1920",
+                    "label": "1080 x 1920 (vertical)"
+                },
+                {
+                    "id": "1080x1080",
+                    "label": "1080 x 1080 (square)"
+                }
+            ]
+        },
+        {
+            "key": "default-frame-rate",
+            "label": "New Sequence Frame Rate",
+            "type": "int",
+            "widget": "spin",
+            "min": 1,
+            "max": 3000,
+            "subtitle": "Frames per second; 2398 and 2997 mean 23.976 and 29.97"
+        },
+        {
+            "key": "auto-sequence",
+            "label": "Start Timeline from First Import",
+            "type": "boolean",
+            "widget": "toggle",
+            "subtitle": "Place the first media on the timeline and match the sequence to it"
+        },
+        {
+            "key": "transition-frames",
+            "label": "Default Transition Length",
+            "type": "int",
+            "widget": "spin",
+            "min": 1,
+            "max": 600,
+            "subtitle": "In frames"
+        },
+        {
+            "key": "snapping",
+            "label": "Snapping",
+            "type": "boolean",
+            "widget": "toggle",
+            "subtitle": "Snap to edits, markers and the playhead"
+        },
+        {
+            "key": "keymap",
+            "label": "Keyboard Layout",
+            "type": "string",
+            "widget": "combo",
+            "options": [
+                {
+                    "id": "montage",
+                    "label": "Montage (Premiere Pro style)"
+                },
+                {
+                    "id": "finalcut",
+                    "label": "Final Cut Pro style"
+                },
+                {
+                    "id": "avid",
+                    "label": "Avid Media Composer style"
+                }
+            ]
+        },
+        {
+            "key": "preview-resolution",
+            "label": "Playback Resolution",
+            "type": "string",
+            "widget": "combo",
+            "options": [
+                {
+                    "id": "full",
+                    "label": "Full"
+                },
+                {
+                    "id": "half",
+                    "label": "Half"
+                },
+                {
+                    "id": "quarter",
+                    "label": "Quarter"
+                }
+            ]
+        },
+        {
+            "key": "use-proxies",
+            "label": "Play Proxies",
+            "type": "boolean",
+            "widget": "toggle",
+            "subtitle": "Exports always use the original media"
+        },
+        {
+            "key": "auto-proxies",
+            "label": "Create Proxies Automatically",
+            "type": "boolean",
+            "widget": "toggle",
+            "subtitle": "For heavy and variable frame rate media"
+        },
+        {
+            "key": "proxy-threshold",
+            "label": "Proxy Above Height",
+            "type": "int",
+            "widget": "spin",
+            "min": 360,
+            "max": 8640,
+            "subtitle": "In pixels"
+        },
+        {
+            "key": "background-render",
+            "label": "Render Effects in the Background",
+            "type": "boolean",
+            "widget": "toggle"
+        },
+        {
+            "key": "hardware-decoding",
+            "label": "Hardware Decoding",
+            "type": "boolean",
+            "widget": "toggle",
+            "subtitle": "Takes effect when Montage starts"
+        },
+        {
+            "key": "hardware-encoding",
+            "label": "Hardware Encoding",
+            "type": "boolean",
+            "widget": "toggle"
+        },
+        {
+            "key": "auto-save-versions",
+            "label": "Auto-Save Versions",
+            "type": "int",
+            "widget": "spin",
+            "min": 0,
+            "max": 50,
+            "subtitle": "Earlier versions kept next to the project"
+        },
+        {
+            "key": "scene-sensitivity",
+            "label": "Scene Detection Sensitivity",
+            "type": "int",
+            "widget": "spin",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "key": "transcription-language",
+            "label": "Transcription Language",
+            "type": "string",
+            "widget": "entry",
+            "subtitle": "Language code such as en or it; empty follows the desktop"
+        },
+        {
+            "key": "transcription-command",
+            "label": "Transcription Command",
+            "type": "string",
+            "widget": "entry",
+            "subtitle": "Empty uses the desktop dictation; {file} and {language} are replaced"
+        }
+    ]
+}
