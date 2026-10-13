@@ -40,7 +40,11 @@ namespace Singularity.Apps.Montage {
             append (scroll);
             var bar = new Scrollbar (Orientation.HORIZONTAL, hadj);
             append (bar);
-            hadj.value_changed.connect (() => area.queue_draw ());
+            hadj.value_changed.connect (() => {
+                ctl.prerender.hold ();
+                area.queue_draw ();
+            });
+            scroll.vadjustment.value_changed.connect (() => ctl.prerender.hold ());
             area.resize.connect ((w, h) => update_extent ());
             ctl.project.changed.connect (() => {
                 update_extent ();
@@ -48,6 +52,7 @@ namespace Singularity.Apps.Montage {
             });
             ctl.selection_changed.connect (() => area.queue_draw ());
             ctl.program.position_changed.connect ((t) => {
+                if (ctl.program.playing) ctl.prerender.hold ();
                 follow (t);
                 area.queue_draw ();
             });
@@ -525,9 +530,21 @@ namespace Singularity.Apps.Montage {
                 cr.fill ();
                 cr.set_source_rgba (0.3, 0.75, 0.35, 1);
                 int64 frame = seq.frame;
-                for (int64 t = ctl.prerender.heavy_starts[i]; t < ctl.prerender.heavy_ends[i]; t += frame) {
-                    if (!ctl.prerender.is_done (t)) continue;
-                    cr.rectangle (x_of (t), RULER - 4, double.max (1, x_of (t + frame) - x_of (t)), 3);
+                int64 range_start = ctl.prerender.heavy_starts[i];
+                int64 from = int64.max (range_start, time_at (HEADER) - frame);
+                from = range_start + (from - range_start) / frame * frame;
+                int64 to = int64.min (ctl.prerender.heavy_ends[i], time_at (width) + frame);
+                if (from >= to) continue;
+                var mask = ctl.prerender.done_mask (from, to, frame);
+                int run = -1;
+                for (int k = 0; k <= mask.length; k++) {
+                    bool on = k < mask.length && mask[k];
+                    if (on && run < 0) run = k;
+                    if (!on && run >= 0) {
+                        double rx0 = x_of (from + run * frame), rx1 = x_of (from + k * frame);
+                        cr.rectangle (rx0, RULER - 4, double.max (1, rx1 - rx0), 3);
+                        run = -1;
+                    }
                 }
                 cr.fill ();
             }

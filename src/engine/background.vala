@@ -135,6 +135,7 @@ namespace Singularity.Apps.Montage {
         int generation;
         Thread<void*>? worker;
         Mutex mutex;
+        int64 held_until;
 
         public Prerender (Project project, FrameCache cache) {
             this.project = project;
@@ -180,6 +181,28 @@ namespace Singularity.Apps.Montage {
                 worker.join ();
                 worker = null;
             }
+        }
+
+        public void hold () {
+            mutex.lock ();
+            held_until = get_monotonic_time () + 400000;
+            mutex.unlock ();
+        }
+
+        bool held () {
+            mutex.lock ();
+            bool r = get_monotonic_time () < held_until;
+            mutex.unlock ();
+            return r;
+        }
+
+        public bool[] done_mask (int64 start, int64 end, int64 frame) {
+            int n = (int) int64.max (0, (end - start + frame - 1) / frame);
+            var mask = new bool[n];
+            mutex.lock ();
+            for (int i = 0; i < n; i++) mask[i] = done.contains (start + i * frame);
+            mutex.unlock ();
+            return mask;
         }
 
         public bool is_done (int64 frame_time) {
@@ -228,6 +251,7 @@ namespace Singularity.Apps.Montage {
                 int count = 0;
                 for (int i = 0; i < starts.size; i++) {
                     for (int64 t = starts[i]; t < ends[i]; t += frame) {
+                        while (held () && AtomicInt.get (ref generation) == gen) Thread.usleep (30000);
                         if (AtomicInt.get (ref generation) != gen) {
                             r.close ();
                             return null;
