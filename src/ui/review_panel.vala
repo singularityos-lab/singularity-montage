@@ -196,7 +196,8 @@ namespace Singularity.Apps.Montage {
             foreach (var s in ctl.project.sequences) {
                 var seq = s;
                 var holder = SharedProject.holder (origin, seq.id);
-                string state = holder == null ? _("Free") : (SharedProject.is_mine (holder) ? _("Locked by you") : _("Locked by %s").printf (holder));
+                string state = _("Free");
+                if (holder != null) state = SharedProject.is_mine (holder) ? _("Locked by you") : _("Locked by %s").printf (holder);
                 var row = new ActionRow (seq.name, state);
                 var toggle = new Button.with_label (holder != null && SharedProject.is_mine (holder) ? _("Release") : _("Lock"));
                 toggle.valign = Align.CENTER;
