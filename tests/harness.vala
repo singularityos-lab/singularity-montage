@@ -8,7 +8,9 @@ namespace Singularity.Apps.Montage {
             if (!condition) {
                 failures++;
                 printerr ("FAIL: %s\n", message);
+                return;
             }
+            print ("ok %s\n", message);
         }
 
         public void close_to (double a, double b, double tolerance, string message) {
