@@ -264,7 +264,10 @@ namespace Singularity.Apps.Montage {
             });
             add (w, "shuttle-forward", (w) => shuttle (w, 1));
             add (w, "shuttle-back", (w) => shuttle (w, -1));
-            add (w, "shuttle-stop", (w) => w.ctl.program.pause ());
+            add (w, "shuttle-stop", (w) => {
+                w.ctl.program.pause ();
+                w.say (_("Paused"));
+            });
             add (w, "frame-back", (w) => {
                 w.ctl.program.pause ();
                 w.ctl.seek (w.ctl.playhead - w.ctl.seq.frame);
