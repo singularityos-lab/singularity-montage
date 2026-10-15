@@ -54,6 +54,7 @@ namespace Singularity.Apps.Montage {
             int64 duration = m.duration;
             string out_path = Path.build_filename (proxy_dir (), "%s-%dp.mkv".printf (Checksum.compute_for_string (ChecksumType.SHA1, uri), h));
             new Thread<void*> ("montage-proxy", () => {
+                Posix.setpriority (Posix.PRIO_PROCESS, 0, 10);
                 string? error = null;
                 try {
                     generate (uri, out_path, w, h, fps_n, fps_d, audio, duration, id);
@@ -246,6 +247,7 @@ namespace Singularity.Apps.Montage {
             if (starts.size == 0) return;
             bool proxies = snap.use_proxies;
             worker = new Thread<void*> ("montage-prerender", () => {
+                Posix.setpriority (Posix.PRIO_PROCESS, 0, 10);
                 var r = new Renderer (snap, seq, scale, proxies);
                 r.cache = null;
                 int count = 0;
