@@ -50,16 +50,23 @@ namespace Singularity.Apps.Montage {
             if (chapters.size == 0) return;
             uint8[] d;
             file.load_contents (null, out d, null);
-            int64 pos = 0, moov = -1, moov_size = 0, mdat = -1;
+            int64 pos = 0, moov = -1, moov_size = 0, moov_header = 8, mdat = -1;
             while (pos + 8 <= d.length) {
                 int64 size = be32 (d, pos);
                 string type = fourcc (d, pos + 4);
-                if (size == 1) size = (int64) (((uint64) be32 (d, pos + 8) << 32) | be32 (d, pos + 12));
-                else if (size == 0) size = d.length - pos;
-                if (size < 8) throw new IOError.INVALID_DATA (_("The MP4 file is damaged."));
+                int64 header = 8;
+                if (size == 1) {
+                    if (pos + 16 > d.length) throw new IOError.INVALID_DATA (_("The MP4 file is damaged."));
+                    size = (int64) (((uint64) be32 (d, pos + 8) << 32) | be32 (d, pos + 12));
+                    header = 16;
+                } else if (size == 0) {
+                    size = d.length - pos;
+                }
+                if (size < header || size > d.length - pos) throw new IOError.INVALID_DATA (_("The MP4 file is damaged."));
                 if (type == "moov") {
                     moov = pos;
                     moov_size = size;
+                    moov_header = header;
                 }
                 if (type == "mdat") mdat = pos;
                 pos += size;
@@ -67,11 +74,11 @@ namespace Singularity.Apps.Montage {
             if (moov < 0) throw new IOError.INVALID_DATA (_("The MP4 file has no movie header."));
             if (mdat > moov) throw new IOError.NOT_SUPPORTED (_("Chapters need the movie header after the media data."));
             var children = new ByteArray ();
-            int64 p = moov + 8;
+            int64 p = moov + moov_header;
             int64 udta = -1, udta_size = 0;
             while (p + 8 <= moov + moov_size) {
                 int64 size = be32 (d, p);
-                if (size < 8) break;
+                if (size < 8 || size > moov + moov_size - p) break;
                 if (fourcc (d, p + 4) == "udta") {
                     udta = p;
                     udta_size = size;
@@ -88,7 +95,7 @@ namespace Singularity.Apps.Montage {
                 int64 q = udta + 8;
                 while (q + 8 <= udta + udta_size) {
                     int64 size = be32 (d, q);
-                    if (size < 8) break;
+                    if (size < 8 || size > udta + udta_size - q) break;
                     if (fourcc (d, q + 4) != "chpl") new_udta.append (d[q:q + size]);
                     q += size;
                 }
