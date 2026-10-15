@@ -46,7 +46,7 @@ namespace Singularity.Apps.Montage {
             int count = u16 (eocd + 10);
             int pos = (int) u32 (eocd + 16);
             for (int n = 0; n < count; n++) {
-                if (pos < 0 || pos + 46 > data.length || u32 (pos) != 0x02014b50) throw new IOError.INVALID_DATA (_("The archive directory is damaged."));
+                if (pos < 0 || (int64) pos + 46 > data.length || u32 (pos) != 0x02014b50) throw new IOError.INVALID_DATA (_("The archive directory is damaged."));
                 var e = new ZipEntry ();
                 e.method = u16 (pos + 10);
                 e.compressed = u32 (pos + 20);
@@ -55,7 +55,7 @@ namespace Singularity.Apps.Montage {
                 int extra_len = u16 (pos + 30);
                 int comment_len = u16 (pos + 32);
                 e.offset = u32 (pos + 42);
-                if (pos + 46 + name_len > data.length) throw new IOError.INVALID_DATA (_("The archive directory is damaged."));
+                if ((int64) pos + 46 + name_len > data.length) throw new IOError.INVALID_DATA (_("The archive directory is damaged."));
                 var nb = new StringBuilder ();
                 nb.append_len ((string) ((uint8*) data + pos + 46), name_len);
                 entries[nb.str] = e;
@@ -71,9 +71,11 @@ namespace Singularity.Apps.Montage {
             var e = entries[name];
             if (e == null) return null;
             int p = (int) e.offset;
-            if (p < 0 || p + 30 > data.length || u32 (p) != 0x04034b50) throw new IOError.INVALID_DATA (_("The archive entry is damaged."));
-            int start = p + 30 + u16 (p + 26) + u16 (p + 28);
-            int end = start + (int) e.compressed;
+            if (p < 0 || (int64) p + 30 > data.length || u32 (p) != 0x04034b50) throw new IOError.INVALID_DATA (_("The archive entry is damaged."));
+            int64 first = (int64) p + 30 + u16 (p + 26) + u16 (p + 28);
+            int64 last = first + e.compressed;
+            if (last > data.length) throw new IOError.INVALID_DATA (_("The archive entry is truncated."));
+            int start = (int) first, end = (int) last;
             if (end > data.length || e.size > 1024 * 1024 * 1024) throw new IOError.INVALID_DATA (_("The archive entry is truncated."));
             uint8[] raw = data[start:end];
             if (e.method == 0) return raw;
