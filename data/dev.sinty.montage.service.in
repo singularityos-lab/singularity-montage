@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=dev.sinty.montage
+Exec=@bindir@/singularity-montage --gapplication-service

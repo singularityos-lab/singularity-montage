@@ -171,3 +171,13 @@ install_data('data/dev.sinty.montage.open.ini',
 install_data('data/dev.sinty.montage.quick.ini',
   install_dir: get_option('datadir') / 'singularity' / 'files-actions'
 )
+
+montage_service_conf = configuration_data()
+montage_service_conf.set('bindir', get_option('prefix') / get_option('bindir'))
+configure_file(
+  input: 'data/dev.sinty.montage.service.in',
+  output: 'dev.sinty.montage.service',
+  configuration: montage_service_conf,
+  install: true,
+  install_dir: get_option('datadir') / 'dbus-1' / 'services'
+)
