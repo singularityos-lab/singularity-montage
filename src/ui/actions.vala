@@ -84,7 +84,7 @@ namespace Singularity.Apps.Montage {
     }
 
     namespace Importing {
-        public async void import_files (MontageWindow w, Gee.List<File> files, string? bin = null) {
+        public async Gee.ArrayList<string> import_files (MontageWindow w, Gee.List<File> files, string? bin = null) {
             var ctl = w.ctl;
             int done = 0;
             var errors = new Gee.ArrayList<string> ();
@@ -135,6 +135,7 @@ namespace Singularity.Apps.Montage {
             }
             if (errors.size > 0) w.say (_("Some files could not be imported: %s").printf (string.joinv ("; ", errors.to_array ())));
             else if (added.size > 0) w.say (ngettext ("Imported %d file.", "Imported %d files.", added.size).printf (added.size));
+            return errors;
         }
 
         public void match_sequence (Controller ctl, MediaItem m) {

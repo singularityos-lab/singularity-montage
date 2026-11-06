@@ -79,6 +79,7 @@ core = files(
 
 ui = files(
   'src/ui/app.vala',
+  'src/ui/agent_intents.vala',
   'src/ui/style.vala',
   'src/ui/keymap.vala',
   'src/ui/playback.vala',

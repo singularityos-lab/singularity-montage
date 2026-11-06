@@ -53,6 +53,7 @@ namespace Singularity.Apps.Montage {
             about_license = _("GNU General Public License, version 3 only");
             if (!get_bool ("hardware-decoding", true) || Encoders.hardware_disabled ()) Encoders.set_hardware_decoding (false);
             Singularity.Application.add_app_css (Style.CSS);
+            MontageIntents.install (this);
             var new_action = new SimpleAction ("new-window", null);
             new_action.activate.connect (() => new MontageWindow (this).present ());
             add_action (new_action);
