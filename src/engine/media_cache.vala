@@ -17,7 +17,6 @@ namespace Singularity.Apps.Montage {
         Gee.HashMap<string, Gdk.Pixbuf> thumbs = new Gee.HashMap<string, Gdk.Pixbuf> ();
         Gee.HashSet<string> pending = new Gee.HashSet<string> ();
         public signal void ready ();
-        ThreadPool<CacheJob>? pool;
 
         class CacheJob {
             public string kind;
@@ -26,12 +25,8 @@ namespace Singularity.Apps.Montage {
             public string key;
         }
 
-        public MediaCache () {
-            try {
-                pool = new ThreadPool<CacheJob>.with_owned_data ((job) => run (job), 2, false);
-            } catch (ThreadError e) {
-                warning ("media cache: %s", e.message);
-            }
+        void submit (CacheJob job) {
+            Async.dispatch (this, Async.Qos.UTILITY, (c) => run (job));
         }
 
         public static string dir (string kind) {
@@ -55,7 +50,7 @@ namespace Singularity.Apps.Montage {
                 job.kind = "peaks";
                 job.uri = uri;
                 job.key = key;
-                try { pool.add (job); } catch (ThreadError e) { }
+                submit (job);
             }
             return null;
         }
@@ -70,27 +65,24 @@ namespace Singularity.Apps.Montage {
                 job.uri = uri;
                 job.time = bucket * 1000000000;
                 job.key = key;
-                try { pool.add (job); } catch (ThreadError e) { }
+                submit (job);
             }
             return null;
         }
 
-        void run (CacheJob job) {
+        Async.Apply run (CacheJob job) {
             if (job.kind == "peaks") {
                 var p = compute_peaks (job.uri);
-                Idle.add (() => {
+                return () => {
                     if (p != null) peaks[job.uri] = p;
                     ready ();
-                    return Source.REMOVE;
-                });
-            } else {
-                var t = compute_thumb (job.uri, job.time);
-                Idle.add (() => {
-                    if (t != null) thumbs[job.key] = t;
-                    ready ();
-                    return Source.REMOVE;
-                });
+                };
             }
+            var t = compute_thumb (job.uri, job.time);
+            return () => {
+                if (t != null) thumbs[job.key] = t;
+                ready ();
+            };
         }
 
         public static Peaks? compute_peaks (string uri) {

@@ -10,15 +10,14 @@ namespace Singularity.Apps.Montage {
             w.say (label);
             double shown = -1;
             string? failure = null;
-            new Thread<void*> ("montage-task", () => {
+            Async.dispatch(w, Async.Qos.USER, (c) => {
                 try {
                     work ((f) => {
                         if (f - shown >= 0.05) {
                             shown = f;
                             double value = f;
-                            Idle.add (() => {
+                            Async.post(w, () => {
                                 w.say ("%s %d%%".printf (label, (int) (value * 100)));
-                                return Source.REMOVE;
                             });
                         }
                         return true;
@@ -26,11 +25,9 @@ namespace Singularity.Apps.Montage {
                 } catch (Error e) {
                     failure = e.message;
                 }
-                Idle.add (() => {
+                return () => {
                     done (failure);
-                    return Source.REMOVE;
-                });
-                return null;
+                };
             });
         }
     }

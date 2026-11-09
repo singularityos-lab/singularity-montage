@@ -98,16 +98,18 @@ namespace Singularity.Apps.Montage {
                 MediaItem? m = null;
                 string? err = null;
                 string uri = f.get_uri ();
-                new Thread<void*> ("montage-probe", () => {
-                    try {
-                        m = Probe.probe (uri);
-                    } catch (Error e) {
-                        err = e.message;
-                    }
-                    Idle.add (import_files.callback);
-                    return null;
-                });
-                yield;
+                try {
+                    yield Async.run<bool>((c) => {
+                        try {
+                            m = Probe.probe (uri);
+                        } catch (Error e) {
+                            err = e.message;
+                        }
+                        return true;
+                    }, Async.Qos.UTILITY);
+                } catch (Error e) {
+                    warning("%s", e.message);
+                }
                 done++;
                 if (m == null) {
                     errors.add (err ?? f.get_basename ());

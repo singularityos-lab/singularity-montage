@@ -93,6 +93,7 @@ namespace Singularity.Apps.Montage {
         Thread<void*>? worker;
         Thread<void*>? audio_worker;
         int audio_generation;
+        Mutex audio_lock;
         public AudioMixer? live_mixer;
         public int64 rendered_frames;
         public int64 dropped_frames;
@@ -120,8 +121,16 @@ namespace Singularity.Apps.Montage {
             stop_audio ();
             if (tick_id != 0) Source.remove (tick_id);
             tick_id = 0;
-            if (worker != null) worker.join ();
+            release (worker);
             worker = null;
+        }
+
+        static void release (Thread<void*>? thread) {
+            if (thread == null) return;
+            Async.dispatch (null, Async.Qos.BACKGROUND, (c) => {
+                thread.join ();
+                return null;
+            });
         }
 
         Project take_snapshot () {
@@ -267,7 +276,10 @@ namespace Singularity.Apps.Montage {
                 int64 first = sample;
                 while (AtomicInt.get (ref audio_generation) == my && sample < end) {
                     mixer.render (sample, block, buf);
-                    if (!audio.push (buf, block, mixer.to_time (sample - first))) break;
+                    audio_lock.lock ();
+                    bool pushed = AtomicInt.get (ref audio_generation) == my && audio.push (buf, block, mixer.to_time (sample - first));
+                    audio_lock.unlock ();
+                    if (!pushed) break;
                     sample += block;
                 }
                 mixer.close ();
@@ -279,7 +291,9 @@ namespace Singularity.Apps.Montage {
             if (audio_worker == null) return;
             AtomicInt.inc (ref audio_generation);
             audio.stop ();
-            audio_worker.join ();
+            audio_lock.lock ();
+            audio_lock.unlock ();
+            release (audio_worker);
             audio_worker = null;
         }
 

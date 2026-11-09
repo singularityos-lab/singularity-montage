@@ -425,16 +425,18 @@ namespace Singularity.Apps.Montage {
 
         public async void run () {
             string? failure = null;
-            new Thread<void*> ("montage-export", () => {
-                try {
-                    run_sync ();
-                } catch (Error e) {
-                    failure = e.message;
-                }
-                Idle.add (run.callback);
-                return null;
-            });
-            yield;
+            try {
+                yield Async.run<bool>((c) => {
+                    try {
+                        run_sync ();
+                    } catch (Error e) {
+                        failure = e.message;
+                    }
+                    return true;
+                }, Async.Qos.USER);
+            } catch (Error e) {
+                warning("%s", e.message);
+            }
             finished (failure == null, failure);
         }
 

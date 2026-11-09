@@ -53,7 +53,7 @@ namespace Singularity.Apps.Montage {
             bool audio = m.has_audio;
             int64 duration = m.duration;
             string out_path = Path.build_filename (proxy_dir (), "%s-%dp.mkv".printf (Checksum.compute_for_string (ChecksumType.SHA1, uri), h));
-            new Thread<void*> ("montage-proxy", () => {
+            Async.dispatch(this, Async.Qos.USER, (c) => {
                 Posix.setpriority (Posix.PRIO_PROCESS, 0, 10);
                 string? error = null;
                 try {
@@ -61,7 +61,7 @@ namespace Singularity.Apps.Montage {
                 } catch (Error e) {
                     error = e.message;
                 }
-                Idle.add (() => {
+                return () => {
                     running = false;
                     var item = project.find_media (id);
                     if (item != null) {
@@ -72,9 +72,7 @@ namespace Singularity.Apps.Montage {
                     }
                     finished (id, error == null, error);
                     next ();
-                    return Source.REMOVE;
-                });
-                return null;
+                };
             });
         }
 
@@ -178,10 +176,17 @@ namespace Singularity.Apps.Montage {
             AtomicInt.inc (ref generation);
             if (timer != 0) Source.remove (timer);
             timer = 0;
-            if (worker != null) {
-                worker.join ();
-                worker = null;
-            }
+            release ();
+        }
+
+        void release () {
+            if (worker == null) return;
+            var old = worker;
+            worker = null;
+            Async.dispatch (null, Async.Qos.BACKGROUND, (c) => {
+                old.join ();
+                return null;
+            });
         }
 
         public void hold () {
@@ -214,10 +219,7 @@ namespace Singularity.Apps.Montage {
         }
 
         void start () {
-            if (worker != null) {
-                worker.join ();
-                worker = null;
-            }
+            release ();
             var snap = project.clone ();
             var seq = snap.sequence;
             int gen = AtomicInt.get (ref generation);
@@ -264,18 +266,16 @@ namespace Singularity.Apps.Montage {
                             cache.store (key, img, true);
                         }
                         mutex.lock ();
-                        done.add (t);
+                        if (AtomicInt.get (ref generation) == gen) done.add (t);
                         mutex.unlock ();
-                        if (++count % 10 == 0) Idle.add (() => {
+                        if (++count % 10 == 0) Async.post(this, () => {
                             updated ();
-                            return Source.REMOVE;
                         });
                     }
                 }
                 r.close ();
-                Idle.add (() => {
+                Async.post(this, () => {
                     updated ();
-                    return Source.REMOVE;
                 });
                 return null;
             });
