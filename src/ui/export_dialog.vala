@@ -49,6 +49,20 @@ namespace Singularity.Apps.Montage {
                 names.add ("%s: %s".printf (presets[i].category, presets[i].name));
                 if (presets[i].id == last) initial = i;
             }
+            if (!encodable (presets[initial])) {
+                var wanted = presets[initial];
+                int fallback = -1;
+                for (int i = 0; i < presets.size; i++) {
+                    var p = presets[i];
+                    if (p.audio_only || p.image_sequence || p.master || !encodable (p)) continue;
+                    if (p.width == wanted.width && p.height == wanted.height) {
+                        fallback = i;
+                        break;
+                    }
+                    if (fallback < 0) fallback = i;
+                }
+                if (fallback >= 0) initial = fallback;
+            }
             preset_drop = new ChoiceRow (_("Preset"), null, names.to_array (), initial);
             fmt.add_row (preset_drop);
             if (presets.size < Presets.all ().size) fmt.add_row (new ActionRow (_("More Formats"), Master.install_hint ()));
@@ -170,6 +184,13 @@ namespace Singularity.Apps.Montage {
                 else info = _("Encoder: %s (software).").printf (hw);
             }
             fmt.description = info;
+        }
+
+        static bool encodable (ExportPreset p) {
+            if (p.image_sequence) return true;
+            if (p.audio_only) return p.acodec == "pcm" || Encoders.audio (p.acodec) != null;
+            if (p.master) return Master.available (p.vcodec);
+            return Encoders.pick (p.vcodec, true) != null;
         }
 
         ExportPreset current_preset () {

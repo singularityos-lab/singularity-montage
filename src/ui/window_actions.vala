@@ -90,6 +90,7 @@ namespace Singularity.Apps.Montage {
                         if (w.pages.visible_child_name != "workspace") w.new_project ();
                         Importing.import_files.begin (w, files);
                     } catch (Error e) {
+                        if (!(e is Gtk.DialogError.DISMISSED)) w.say (e.message);
                     }
                 });
             });

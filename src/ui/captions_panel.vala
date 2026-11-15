@@ -37,7 +37,7 @@ namespace Singularity.Apps.Montage {
                 item.transcript = Transcript.serialize (words);
                 w.project.commit ();
                 w.say (ngettext ("Transcribed %d word. Open the Captions workspace to edit by text.", "Transcribed %d words. Open the Captions workspace to edit by text.", words.size).printf (words.size));
-                w.activate_action ("win.workspace", new Variant.string ("captions"));
+                w.activate_action ("workspace", new Variant.string ("captions"));
             });
         }
     }
@@ -65,7 +65,7 @@ namespace Singularity.Apps.Montage {
             var transcribe = new Button.with_label (_("Transcribe"));
             transcribe.tooltip_text = _("Transcribe the selected clip");
             transcribe.valign = Align.CENTER;
-            transcribe.clicked.connect (() => w.activate_action ("win.transcribe", null));
+            transcribe.clicked.connect (() => w.activate_action ("transcribe", null));
             tg.add_header_suffix (transcribe);
             words.selection_mode = SelectionMode.NONE;
             words.max_children_per_line = 40;
@@ -98,9 +98,9 @@ namespace Singularity.Apps.Montage {
             append (cg);
             var io = new PreferencesGroup ();
             io.title = _("Subtitle Files");
-            io.add_row (Rows.action (_("Import SRT or WebVTT…"), null, () => w.activate_action ("win.import-subtitles", null)));
-            io.add_row (Rows.action (_("Export SRT…"), null, () => w.activate_action ("win.export-srt", null)));
-            io.add_row (Rows.action (_("Export WebVTT…"), null, () => w.activate_action ("win.export-vtt", null)));
+            io.add_row (Rows.action (_("Import SRT or WebVTT…"), null, () => w.activate_action ("import-subtitles", null)));
+            io.add_row (Rows.action (_("Export SRT…"), null, () => w.activate_action ("export-srt", null)));
+            io.add_row (Rows.action (_("Export WebVTT…"), null, () => w.activate_action ("export-vtt", null)));
             append (io);
             ctl.project.changed.connect (() => {
                 if (get_mapped ()) rebuild ();

@@ -92,7 +92,7 @@ namespace Singularity.Apps.Montage {
             var pg = new PreferencesGroup ();
             pg.title = _("Review Package");
             pg.description = _("Send the cut with its comments to a reviewer, then bring their replies back.");
-            pg.add_row (Rows.action (_("Make Review Package…"), null, () => w.activate_action ("win.export-review", null)));
+            pg.add_row (Rows.action (_("Make Review Package…"), null, () => w.activate_action ("export-review", null)));
             pg.add_row (Rows.action (_("Share Link"), _("Upload the last review package to your online account and copy the link"), () => {
                 if (last_package == null) {
                     w.say (_("Make a review package first."));

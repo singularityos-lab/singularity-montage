@@ -135,7 +135,7 @@ namespace Singularity.Apps.Montage {
             proxies_toggle = c.add_toggle ("video-x-generic-symbolic", _("Use Proxies"));
             proxies_toggle.active = win.project.use_proxies;
             proxies_toggle.toggled.connect ((on) => {
-                if (win.project.use_proxies != on) win.activate_action ("win.use-proxies", null);
+                if (win.project.use_proxies != on) win.activate_action ("use-proxies", null);
             });
             act (c, "view-reveal-symbolic", _("Simple Mode"), "win.simple-mode");
         }

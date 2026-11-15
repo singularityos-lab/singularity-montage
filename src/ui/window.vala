@@ -70,15 +70,15 @@ namespace Singularity.Apps.Montage {
             welcome.title = _("Montage");
             welcome.subtitle = _("Edit video on a multitrack timeline, then export for the web, social or a master");
             welcome.add_action ("document-new", _("New Project"), _("Start with an empty 1080p timeline"), () => new_project ());
-            welcome.add_action ("document-open", _("Open Project"), _("Continue a Montage project or open an OTIO, EDL or FCP XML timeline"), () => activate_action ("win.open", null));
+            welcome.add_action ("document-open", _("Open Project"), _("Continue a Montage project or open an OTIO, EDL or FCP XML timeline"), () => activate_action ("open", null));
             welcome.add_action ("folder-videos", _("Import Media"), _("Create a project from video, audio and pictures"), () => {
                 new_project ();
-                activate_action ("win.import", null);
+                activate_action ("import", null);
             });
             welcome.add_action ("video-trim", _("Quick Edit"), _("Trim one video with the simple editor"), () => {
                 new_project ();
                 set_simple (true);
-                activate_action ("win.import", null);
+                activate_action ("import", null);
             });
             var orphans = Session.orphans ();
             if (orphans.size > 0) {
@@ -140,9 +140,9 @@ namespace Singularity.Apps.Montage {
             });
             if (source) {
                 var insert = strip.add_icon_button ("list-add-symbolic", tip (_("Insert into the Timeline at the Playhead"), "win.insert"));
-                insert.clicked.connect (() => activate_action ("win.insert", null));
+                insert.clicked.connect (() => activate_action ("insert", null));
                 var overwrite = strip.add_icon_button ("edit-paste-symbolic", tip (_("Overwrite the Timeline at the Playhead"), "win.overwrite"));
-                overwrite.clicked.connect (() => activate_action ("win.overwrite", null));
+                overwrite.clicked.connect (() => activate_action ("overwrite", null));
             }
             strip.add_spacer ();
             card.append (strip);
@@ -267,15 +267,15 @@ namespace Singularity.Apps.Montage {
         }
 
         void build_bubbles () {
-            workspace_bubbles.add (add_bubble_icon ("go-previous-symbolic", _("Close Project"), () => activate_action ("win.close-project", null)));
+            workspace_bubbles.add (add_bubble_icon ("go-previous-symbolic", _("Close Project"), () => activate_action ("close-project", null)));
             workspace_bubbles.add (add_bubble_icon ("sidebar-show-symbolic", tip (_("Project Panel"), "win.toggle-sidebar"), () => set_sidebar_visible (!get_sidebar_visible ())));
-            workspace_bubbles.add (add_bubble_icon ("document-save-symbolic", tip (_("Save Project"), "win.save"), () => activate_action ("win.save", null)));
-            workspace_bubbles.add (add_bubble_icon ("edit-undo-symbolic", tip (_("Undo"), "win.undo"), () => activate_action ("win.undo", null)));
-            workspace_bubbles.add (add_bubble_icon ("edit-redo-symbolic", tip (_("Redo"), "win.redo"), () => activate_action ("win.redo", null)));
+            workspace_bubbles.add (add_bubble_icon ("document-save-symbolic", tip (_("Save Project"), "win.save"), () => activate_action ("save", null)));
+            workspace_bubbles.add (add_bubble_icon ("edit-undo-symbolic", tip (_("Undo"), "win.undo"), () => activate_action ("undo", null)));
+            workspace_bubbles.add (add_bubble_icon ("edit-redo-symbolic", tip (_("Redo"), "win.redo"), () => activate_action ("redo", null)));
             ribbon.attach (this);
             workspace_bubbles.add (ribbon.tabs);
             workspace_bubbles.add (add_bubble_icon ("sidebar-show-right-symbolic", tip (_("Inspector"), "win.toggle-inspector"), () => inspector_revealer.reveal_child = !inspector_revealer.reveal_child));
-            workspace_bubbles.add (add_bubble_suggested (_("Export…"), () => activate_action ("win.export", null)));
+            workspace_bubbles.add (add_bubble_suggested (_("Export…"), () => activate_action ("export", null)));
         }
 
         void connect_signals () {
@@ -301,7 +301,7 @@ namespace Singularity.Apps.Montage {
                 inspector.show_media (m);
                 ctl.select (null);
             });
-            media_panel.request_import.connect (() => activate_action ("win.import", null));
+            media_panel.request_import.connect (() => activate_action ("import", null));
             timeline.trim_preview.connect ((left, right, active) => {
                 if (!active) {
                     program_view.show_compare (null);
@@ -366,22 +366,22 @@ namespace Singularity.Apps.Montage {
 
         void show_context_menu (double x, double y) {
             var menu = new ContextMenu (timeline);
-            menu.add_item (_("Split at Playhead"), "edit-cut-symbolic", () => activate_action ("win.split", null));
-            menu.add_item (_("Ripple Delete"), "edit-delete-symbolic", () => activate_action ("win.ripple-delete", null));
+            menu.add_item (_("Split at Playhead"), "edit-cut-symbolic", () => activate_action ("split", null));
+            menu.add_item (_("Ripple Delete"), "edit-delete-symbolic", () => activate_action ("ripple-delete", null));
             menu.add_separator ();
-            menu.add_item (_("Speed…"), "media-seek-forward-symbolic", () => activate_action ("win.speed", null));
-            menu.add_item (_("Enable or Disable"), "object-select-symbolic", () => activate_action ("win.toggle-clip", null));
-            menu.add_item (_("Link"), "insert-link-symbolic", () => activate_action ("win.link", null));
-            menu.add_item (_("Unlink"), "edit-clear-symbolic", () => activate_action ("win.unlink", null));
-            menu.add_item (_("Nest"), "folder-symbolic", () => activate_action ("win.nest", null));
-            menu.add_item (_("Move into Sync"), "emblem-synchronizing-symbolic", () => activate_action ("win.resync", null));
+            menu.add_item (_("Speed…"), "media-seek-forward-symbolic", () => activate_action ("speed", null));
+            menu.add_item (_("Enable or Disable"), "object-select-symbolic", () => activate_action ("toggle-clip", null));
+            menu.add_item (_("Link"), "insert-link-symbolic", () => activate_action ("link", null));
+            menu.add_item (_("Unlink"), "edit-clear-symbolic", () => activate_action ("unlink", null));
+            menu.add_item (_("Nest"), "folder-symbolic", () => activate_action ("nest", null));
+            menu.add_item (_("Move into Sync"), "emblem-synchronizing-symbolic", () => activate_action ("resync", null));
             menu.add_separator ();
-            menu.add_item (_("Add Default Transition"), "list-add-symbolic", () => activate_action ("win.add-transition", null));
-            menu.add_item (_("Stabilize"), "camera-video-symbolic", () => activate_action ("win.stabilize", null));
-            menu.add_item (_("Detect Scenes"), "edit-find-symbolic", () => activate_action ("win.detect-scenes", null));
-            menu.add_item (_("Edit in Wave"), "audio-x-generic-symbolic", () => activate_action ("win.send-wave", null));
+            menu.add_item (_("Add Default Transition"), "list-add-symbolic", () => activate_action ("add-transition", null));
+            menu.add_item (_("Stabilize"), "camera-video-symbolic", () => activate_action ("stabilize", null));
+            menu.add_item (_("Detect Scenes"), "edit-find-symbolic", () => activate_action ("detect-scenes", null));
+            menu.add_item (_("Edit in Wave"), "audio-x-generic-symbolic", () => activate_action ("send-wave", null));
             menu.add_separator ();
-            menu.add_item (_("Delete"), "user-trash-symbolic", () => activate_action ("win.lift", null), "destructive-action");
+            menu.add_item (_("Delete"), "user-trash-symbolic", () => activate_action ("lift", null), "destructive-action");
             menu.pointing_to = Gdk.Rectangle () { x = (int) x, y = (int) y, width = 1, height = 1 };
             menu.popup ();
         }

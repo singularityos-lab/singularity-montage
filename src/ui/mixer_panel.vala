@@ -201,13 +201,13 @@ namespace Singularity.Apps.Montage {
                 ctl.seq.loudness_target = targets[i];
                 ctl.project.commit ();
             }));
-            loud.add_row (Rows.action (_("Match Clip Loudness"), _("Bring the selected audio clips to the export target"), () => w.activate_action ("win.normalize", null)));
+            loud.add_row (Rows.action (_("Match Clip Loudness"), _("Bring the selected audio clips to the export target"), () => w.activate_action ("normalize", null)));
             append (loud);
             var tools = new PreferencesGroup ();
             tools.title = _("Sound");
-            tools.add_row (Rows.action (_("Duck Music"), _("Lower music clips while dialogue plays"), () => w.activate_action ("win.auto-duck", null)));
-            tools.add_row (Rows.action (_("Record Voiceover"), _("Record from the microphone at the playhead"), () => w.activate_action ("win.record", null)));
-            tools.add_row (Rows.action (_("Edit Sound in Wave"), _("Mix the sequence in Wave and bring it back"), () => w.activate_action ("win.sound-in-wave", null)));
+            tools.add_row (Rows.action (_("Duck Music"), _("Lower music clips while dialogue plays"), () => w.activate_action ("auto-duck", null)));
+            tools.add_row (Rows.action (_("Record Voiceover"), _("Record from the microphone at the playhead"), () => w.activate_action ("record", null)));
+            tools.add_row (Rows.action (_("Edit Sound in Wave"), _("Mix the sequence in Wave and bring it back"), () => w.activate_action ("sound-in-wave", null)));
             append (tools);
             append (details);
             ctl.project.changed.connect (() => {
