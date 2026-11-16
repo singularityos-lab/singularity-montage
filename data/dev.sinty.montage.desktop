@@ -7,6 +7,7 @@ Icon=dev.sinty.montage
 Terminal=false
 Type=Application
 Categories=AudioVideo;Video;AudioVideoEditing;
+X-Sinty-FormFactors=desktop;tablet;phone
 Keywords=video;editor;timeline;cut;trim;montage;premiere;subtitles;
 MimeType=application/x-montage-project;application/x-otio;text/x-edl;application/x-fcpxml;
 StartupNotify=true
