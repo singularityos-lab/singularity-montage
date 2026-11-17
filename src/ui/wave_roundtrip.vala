@@ -24,7 +24,7 @@ namespace Singularity.Apps.Montage {
                     if (!parent.query_exists ()) parent.make_directory_with_parents ();
                     FileUtils.set_contents (file.get_path (), LegacyFormat.write (w.project, seq));
                     watch (w, file, seq.id);
-                    string? exe = Environment.find_program_in_path ("singularity-wave");
+                    string? exe = wave_executable ();
                     if (exe == null) {
                         w.say (_("Wave is not installed. Install it to edit the sound of this sequence."));
                         return;
@@ -35,6 +35,15 @@ namespace Singularity.Apps.Montage {
                     w.say (e.message);
                 }
             });
+        }
+
+        string? wave_executable () {
+            var info = new DesktopAppInfo ("dev.sinty.wave.desktop");
+            if (info != null) {
+                string? exe = info.get_executable ();
+                if (exe != null && Path.is_absolute (exe) && FileUtils.test (exe, FileTest.IS_EXECUTABLE)) return exe;
+            }
+            return Environment.find_program_in_path ("singularity-wave");
         }
 
         void watch (MontageWindow w, File file, string seq_id) {
