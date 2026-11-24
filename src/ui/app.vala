@@ -1,7 +1,7 @@
 using Gtk;
 
 namespace Singularity.Apps.Montage {
-    public class MontageApp : Singularity.Application {
+    public class MontageApp : Singularity.Application, Singularity.Migration.Migratable {
         public GLib.Settings? settings;
         public bool simple_mode;
         public string? from_videos;
@@ -163,6 +163,45 @@ namespace Singularity.Apps.Montage {
             }));
             menu.append_submenu (_("Markers"), mark);
             set_menubar (menu);
+        }
+
+        public void prepare_move () throws Singularity.Migration.MigrationError {
+            if (VoiceOver.active ()) throw new Singularity.Migration.MigrationError.UNSUPPORTED (_("Montage can move once the voiceover recording is stopped"));
+            foreach (var w in get_windows ()) {
+                var mw = w as MontageWindow;
+                if (mw != null && mw.ctl.queue.pending > 0) throw new Singularity.Migration.MigrationError.UNSUPPORTED (_("Montage can move once the export queue is finished"));
+            }
+        }
+
+        public Variant save_model () {
+            return new VariantDict ().end ();
+        }
+
+        public async void restore_model (Variant model) throws Error {
+        }
+
+        public string window_kind (Gtk.Window w) {
+            return (w is MontageWindow) ? "project" : "";
+        }
+
+        public Variant save_window (Gtk.Window w) {
+            return ((MontageWindow) w).save_migration ();
+        }
+
+        public string[] files () {
+            var found = new Gee.ArrayList<string> ();
+            foreach (var w in get_windows ()) {
+                var mw = w as MontageWindow;
+                if (mw != null && mw.visible) mw.migration_files (found);
+            }
+            return found.to_array ();
+        }
+
+        public async Gtk.Window? rebuild_window (string kind, Variant data) throws Error {
+            if (kind != "project") return null;
+            var w = new MontageWindow (this);
+            w.restore_migration (data);
+            return w;
         }
 
         public override void activate () {

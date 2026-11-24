@@ -23,6 +23,7 @@ namespace Singularity.Apps.Montage {
         Gdk.RGBA fg;
         Gdk.RGBA accent;
         public string? hover_info;
+        double pending_offset = -1;
 
         static string[] LABELS = { "#5e81ac", "#bf616a", "#d08770", "#ebcb8b", "#a3be8c", "#b48ead", "#88c0d0", "#e5739f" };
 
@@ -133,6 +134,21 @@ namespace Singularity.Apps.Montage {
             hadj.step_increment = 20;
             hadj.page_increment = hadj.page_size * 0.8;
             area.content_height = (int) (RULER + total_height () + 20);
+            if (pending_offset >= 0 && area.get_width () > 0) {
+                hadj.value = pending_offset;
+                pending_offset = -1;
+            }
+        }
+
+        public double offset {
+            get { return pending_offset >= 0 ? pending_offset : hadj.value; }
+        }
+
+        public void restore_view (double pps, double at) {
+            pixels_per_second = pps.clamp (2, 2000);
+            pending_offset = at;
+            update_extent ();
+            area.queue_draw ();
         }
 
         public Gee.ArrayList<Track> display_tracks () {

@@ -117,6 +117,24 @@ namespace Singularity.Apps.Montage {
             changed ();
         }
 
+        public Variant save_history () {
+            return new Variant ("(@as@as@as@as)", new Variant.strv (undo_stack.to_array ()), new Variant.strv (undo_labels.to_array ()),
+                new Variant.strv (redo_stack.to_array ()), new Variant.strv (redo_labels.to_array ()));
+        }
+
+        public void restore_history (string[] undo, string[] undo_names, string[] redo, string[] redo_names) {
+            if (undo.length != undo_names.length || redo.length != redo_names.length) return;
+            undo_stack.clear ();
+            undo_labels.clear ();
+            redo_stack.clear ();
+            redo_labels.clear ();
+            foreach (var s in undo) undo_stack.add (s);
+            foreach (var s in undo_names) undo_labels.add (s);
+            foreach (var s in redo) redo_stack.add (s);
+            foreach (var s in redo_names) redo_labels.add (s);
+            changed ();
+        }
+
         public void undo () {
             if (!can_undo) return;
             redo_stack.add (serialize ());

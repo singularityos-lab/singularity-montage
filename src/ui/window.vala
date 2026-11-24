@@ -474,6 +474,125 @@ namespace Singularity.Apps.Montage {
             });
         }
 
+        public Variant save_migration () {
+            var d = new VariantDict ();
+            d.insert_value ("page", new Variant.string (pages.visible_child_name));
+            d.insert_value ("project", new Variant.string (project.serialize ()));
+            d.insert_value ("history", project.save_history ());
+            d.insert_value ("home", new Variant.string (File.new_for_path (Environment.get_home_dir ()).get_uri ()));
+            d.insert_value ("origin", new Variant.string (session.origin != null ? Singularity.Migration.portable_path (session.origin) : ""));
+            d.insert_value ("modified", new Variant.boolean (session.modified));
+            d.insert_value ("simple", new Variant.boolean (simple));
+            d.insert_value ("sidebar", new Variant.boolean (get_sidebar_visible ()));
+            d.insert_value ("inspector", new Variant.boolean (inspector_revealer.reveal_child));
+            d.insert_value ("workspace", new Variant.string (inspector_stack.visible_child_name ?? ""));
+            d.insert_value ("tool", new Variant.string (ctl.tool));
+            d.insert_value ("snapping", new Variant.boolean (ctl.snapping));
+            d.insert_value ("linked", new Variant.boolean (ctl.linked));
+            var ids = new Gee.ArrayList<string> ();
+            ids.add_all (ctl.selection);
+            ids.sort ((a, b) => strcmp (a, b));
+            d.insert_value ("selection", new Variant.strv (ids.to_array ()));
+            d.insert_value ("track", new Variant.string (ctl.selected_track));
+            d.insert_value ("playhead", new Variant.int64 (ctl.playhead));
+            d.insert_value ("source", new Variant.string (ctl.source_media != null ? ctl.source_media.id : ""));
+            d.insert_value ("source-position", new Variant.int64 (ctl.source.position));
+            d.insert_value ("inspected", new Variant.string (inspector.media != null ? inspector.media.id : ""));
+            d.insert_value ("zoom", new Variant.double (timeline.pixels_per_second));
+            d.insert_value ("offset", new Variant.double (timeline.offset));
+            d.insert_value ("status", new Variant.string (status.label));
+            return d.end ();
+        }
+
+        public void restore_migration (Variant data) {
+            var d = new VariantDict (data);
+            string home = (d.lookup_value ("home", VariantType.STRING) ?? new Variant.string ("")).get_string ();
+            string here = File.new_for_path (Environment.get_home_dir ()).get_uri ();
+            var text = d.lookup_value ("project", VariantType.STRING);
+            if (text != null) {
+                try {
+                    project.replace_with (Project.parse (rehome (text.get_string (), home, here)));
+                } catch (Error e) {
+                    say (e.message);
+                }
+                var history = d.lookup_value ("history", new VariantType ("(asasasas)"));
+                if (history != null) {
+                    project.restore_history (rehome_all (history.get_child_value (0).get_strv (), home, here), history.get_child_value (1).get_strv (),
+                        rehome_all (history.get_child_value (2).get_strv (), home, here), history.get_child_value (3).get_strv ());
+                }
+                string origin = (d.lookup_value ("origin", VariantType.STRING) ?? new Variant.string ("")).get_string ();
+                bool modified = (d.lookup_value ("modified", VariantType.BOOLEAN) ?? new Variant.boolean (false)).get_boolean ();
+                session.adopt (origin != "" ? Singularity.Migration.local_file (origin) : null, modified);
+                SharedProject.refresh_locks (project, session.origin);
+            }
+            string page = (d.lookup_value ("page", VariantType.STRING) ?? new Variant.string ("welcome")).get_string ();
+            if (page == "workspace") show_workspace ();
+            else show_welcome ();
+            var simple_mode = d.lookup_value ("simple", VariantType.BOOLEAN);
+            if (simple_mode != null && simple_mode.get_boolean () != simple) set_simple (simple_mode.get_boolean ());
+            var sidebar = d.lookup_value ("sidebar", VariantType.BOOLEAN);
+            if (sidebar != null) set_sidebar_visible (sidebar.get_boolean ());
+            string workspace = (d.lookup_value ("workspace", VariantType.STRING) ?? new Variant.string ("")).get_string ();
+            if (workspace != "" && inspector_stack.get_child_by_name (workspace) != null) {
+                workspace_switch.set_active (workspace);
+                inspector_stack.visible_child_name = workspace;
+            }
+            var inspector = d.lookup_value ("inspector", VariantType.BOOLEAN);
+            if (inspector != null) inspector_revealer.reveal_child = inspector.get_boolean ();
+            string tool = (d.lookup_value ("tool", VariantType.STRING) ?? new Variant.string ("select")).get_string ();
+            if (tool_buttons.has_key (tool)) tool_buttons[tool].active = true;
+            var snapping = d.lookup_value ("snapping", VariantType.BOOLEAN);
+            if (snapping != null) ctl.snapping = snapping.get_boolean ();
+            var linked = d.lookup_value ("linked", VariantType.BOOLEAN);
+            if (linked != null) ctl.linked = linked.get_boolean ();
+            ribbon.sync ();
+            var selection = d.lookup_value ("selection", VariantType.STRING_ARRAY);
+            if (selection != null) {
+                var ids = new Gee.ArrayList<string> ();
+                foreach (var id in selection.get_strv ()) if (ctl.seq.clip (id) != null) ids.add (id);
+                ctl.select_ids (ids);
+            }
+            ctl.selected_track = (d.lookup_value ("track", VariantType.STRING) ?? new Variant.string ("")).get_string ();
+            var source = project.find_media ((d.lookup_value ("source", VariantType.STRING) ?? new Variant.string ("")).get_string ());
+            if (source != null) {
+                ctl.show_source (source);
+                ctl.source.seek ((d.lookup_value ("source-position", VariantType.INT64) ?? new Variant.int64 (0)).get_int64 ());
+            }
+            var inspected = project.find_media ((d.lookup_value ("inspected", VariantType.STRING) ?? new Variant.string ("")).get_string ());
+            if (inspected != null) this.inspector.show_media (inspected);
+            var playhead = d.lookup_value ("playhead", VariantType.INT64);
+            if (playhead != null) ctl.seek (playhead.get_int64 ());
+            var zoom = d.lookup_value ("zoom", VariantType.DOUBLE);
+            var offset = d.lookup_value ("offset", VariantType.DOUBLE);
+            if (zoom != null && offset != null) timeline.restore_view (zoom.get_double (), offset.get_double ());
+            update_title ();
+            var message = d.lookup_value ("status", VariantType.STRING);
+            if (message != null) say (message.get_string ());
+        }
+
+        public void migration_files (Gee.List<string> found) {
+            if (session.origin != null) {
+                string path = Singularity.Migration.portable_path (session.origin);
+                if (!found.contains (path)) found.add (path);
+            }
+            foreach (var m in project.media) {
+                if (m.kind != "file" || !m.uri.has_prefix ("file://")) continue;
+                string path = Singularity.Migration.portable_path (File.new_for_uri (m.uri));
+                if (!found.contains (path)) found.add (path);
+            }
+        }
+
+        static string rehome (string text, string home, string here) {
+            if (home == "" || home == here) return text;
+            return text.replace (home + "/", here + "/");
+        }
+
+        static string[] rehome_all (string[] texts, string home, string here) {
+            string[] r = {};
+            foreach (var t in texts) r += rehome (t, home, here);
+            return r;
+        }
+
         public void set_simple (bool value) {
             simple = value;
             source_pane.visible = !value;

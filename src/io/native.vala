@@ -119,6 +119,13 @@ namespace Singularity.Apps.Montage {
             modified = false;
         }
 
+        public void adopt (File? file, bool changed) {
+            origin = file;
+            saved_revision = changed ? project.revision - 1 : project.revision;
+            modified = changed;
+            if (changed) schedule ();
+        }
+
         public void save (File file) throws Error {
             if (file.query_exists () && versions > 0) keep_version (file);
             NativeFormat.save (project, file);

@@ -175,6 +175,10 @@ namespace Singularity.Apps.Montage {
     namespace VoiceOver {
         Gst.Pipeline? pipeline;
 
+        public bool active () {
+            return pipeline != null;
+        }
+
         public void start (MontageWindow w) {
             if (pipeline != null) return;
             var dir = File.new_for_path (Path.build_filename (Environment.get_user_special_dir (UserDirectory.MUSIC) ?? Environment.get_home_dir (), "Montage Recordings"));
