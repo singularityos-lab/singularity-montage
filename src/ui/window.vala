@@ -36,6 +36,7 @@ namespace Singularity.Apps.Montage {
         public bool simple;
         Box recovery_box = new Box (Orientation.VERTICAL, 6);
         bool closing_confirmed;
+        bool torn_down;
 
         public MontageWindow (MontageApp app) {
             Object (application: app, title: _("Montage"), default_width: 1500, default_height: 920);
@@ -601,11 +602,17 @@ namespace Singularity.Apps.Montage {
             say (value ? _("Simple mode: cut, trim and export. Open the View menu to bring back the panels.") : _("All panels are shown."));
         }
 
+        public void tear_down () {
+            if (torn_down) return;
+            torn_down = true;
+            ctl.queue.cancel_all ();
+            ctl.shutdown ();
+            session.close ();
+        }
+
         bool on_close () {
             if (closing_confirmed || !session.modified) {
-                ctl.queue.cancel_all ();
-                ctl.shutdown ();
-                session.close ();
+                tear_down ();
                 return false;
             }
             var dialog = new ConfirmDialog (application, _("Save Changes?"), "dialog-warning",

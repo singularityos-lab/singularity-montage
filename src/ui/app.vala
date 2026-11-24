@@ -173,6 +173,11 @@ namespace Singularity.Apps.Montage {
             }
         }
 
+        public void release_window (Window window) {
+            var mw = window as MontageWindow;
+            if (mw != null) mw.tear_down ();
+        }
+
         public Variant save_model () {
             return new VariantDict ().end ();
         }
